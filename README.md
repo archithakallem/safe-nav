@@ -63,6 +63,15 @@ Open frontend/index.html in browser
 OR
 Use Live Server in VS Code
 
+🔑 Google Maps API Setup
+To run this project, you need your own Google Maps API key:
+Go to Google Cloud Console
+Enable Maps JavaScript API
+Create an API key
+Replace in frontend/index.html:
+key=YOUR_API_KEY_HERE
+
+⚠️ Do not expose your API key publicly. Always use restrictions.
 🔐 Environment & Security
 Sensitive data (API keys, DB credentials) is stored in .env
 .env is excluded using .gitignore
