@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafetyMap - Community Safety Reviews</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header Bar -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="app-title">Safe-Navigation</h1>
+            <div class="header-controls">
+                <button class="btn btn--secondary btn--sm" id="toggleHeatMap">
+                    <span class="control-icon">🗺️</span>
+                    Heat Map
+                </button>
+                <button class="btn btn--secondary btn--sm" id="toggleLocation">
+                    <span class="control-icon">📍</span>
+                    Live Location
+                </button>
+                <button class="btn btn--primary btn--sm" id="toggleReviewMode">
+                    <span class="control-icon">✍️</span>
+                    Add Review
+                </button>
+                <button class="btn btn--outline btn--sm" id="clearData">
+                    <span class="control-icon">🗑️</span>
+                    Clear Data
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Side Panel -->
+        <aside class="side-panel" id="sidePanel">
+            <div class="panel-header">
+                <h3>Review Dashboard</h3>
+                <button class="btn btn--outline btn--sm" id="togglePanel">
+                    <span class="panel-toggle-icon">←</span>
+                </button>
+            </div>
+
+            <div class="panel-content">
+                <!-- Statistics -->
+                <div class="stats-section">
+                    <h4>Statistics</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value" id="totalReviews">0</span>
+                            <span class="stat-label">Total Reviews</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="avgSafety">0.0</span>
+                            <span class="stat-label">Avg Safety</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="avgInfra">0.0</span>
+                            <span class="stat-label">Avg Infrastructure</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="recentReviews">0</span>
+                            <span class="stat-label">This Week</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-section">
+                    <h4>Filters</h4>
+                    <div class="filter-group">
+                        <label>Safety Rating</label>
+                        <div class="range-slider">
+                            <input type="range" id="safetyFilter" min="1" max="5" value="1" step="0.5">
+                            <span class="range-value" id="safetyValue">1+</span>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Infrastructure Rating</label>
+                        <div class="range-slider">
+                            <input type="range" id="infraFilter" min="1" max="5" value="1" step="0.5">
+                            <span class="range-value" id="infraValue">1+</span>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Time Period</label>
+                        <select id="timeFilter">
+                            <option value="all">All Time</option>
+                            <option value="week">Last Week</option>
+                            <option value="month">Last Month</option>
+                            <option value="year">Last Year</option>
+                        </select>
+                    </div>
+                    <button class="btn btn--primary btn--sm" id="applyFilters">Apply Filters</button>
+                    <button class="btn btn--outline btn--sm" id="resetFilters">Reset</button>
+                </div>
+
+                <!-- Recent Reviews -->
+                <div class="recent-section">
+                    <h4>Recent Reviews</h4>
+                    <div class="recent-list" id="recentList">
+                        <!-- Recent reviews will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Map Container -->
+        <main class="map-container">
+            <div id="map" class="map"></div>
+
+            <!-- Location Status -->
+            <div class="location-status" id="locationStatus">
+                <span class="status-text">Location: Not Available</span>
+            </div>
+
+            <!-- Review Mode Indicator -->
+            <div class="review-mode-indicator" id="reviewModeIndicator" style="display: none;">
+                <span class="indicator-text">📍 Click anywhere on the map to add a review</span>
+            </div>
+        </main>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal-overlay" id="reviewModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add Safety Review</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="reviewForm">
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="reviewAddress" readonly>
+                        <small>Coordinates: <span id="reviewCoords"></span></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Safety Rating</label>
+                        <div class="rating-slider">
+                            <input type="range" id="safetyRating" min="1" max="5" value="3" step="1">
+                            <div class="rating-labels">
+                                <span>Dangerous</span>
+                                <span>Poor</span>
+                                <span>Average</span>
+                                <span>Good</span>
+                                <span>Excellent</span>
+                            </div>
+                            <div class="rating-value">Rating: <span id="safetyRatingValue">3</span>/5</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Infrastructure Rating</label>
+                        <div class="rating-slider">
+                            <input type="range" id="infraRating" min="1" max="5" value="3" step="1">
+                            <div class="rating-labels">
+                                <span>Very Poor</span>
+                                <span>Poor</span>
+                                <span>Average</span>
+                                <span>Good</span>
+                                <span>Excellent</span>
+                            </div>
+                            <div class="rating-value">Rating: <span id="infraRatingValue">3</span>/5</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="reviewDescription" placeholder="Describe the safety conditions, infrastructure quality, any concerns or recommendations..." rows="4"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn--outline" id="cancelReview">Cancel</button>
+                        <button type="submit" class="btn btn--primary">Save Review</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Review Modal -->
+    <div class="modal-overlay" id="viewModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Review Details</h3>
+                <button class="modal-close" id="closeViewModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="viewContent">
+                    <!-- Review details will be populated here -->
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn--outline" id="closeView">Close</button>
+                    <button type="button" class="btn btn--danger" id="deleteReview">Delete Review</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer">
+        <!-- Notifications will be added here -->
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+        <p>Loading SafetyMap...</p>
+    </div>
+
+    <!-- Google Maps API -->
+    <script async defer 
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFzcKeD8p0lYwJzOGsm3Y-vS2UZM9Z2Tk&libraries=visualization&callback=initMap">
+    </script>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>
